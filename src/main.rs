@@ -5,6 +5,7 @@ mod input;
 mod output;
 mod orderbook;
 mod routes;
+mod balance;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()>{

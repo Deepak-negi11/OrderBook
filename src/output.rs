@@ -11,7 +11,7 @@ pub struct CreateOrderResponse{
 }
 
 #[derive(Serialize,Deserialize)]
-pub struct DelteOrderResponse{
+pub struct DeleteOrderResponse{
     pub order_id : String,
     pub success : bool
 }
@@ -23,7 +23,7 @@ pub struct PriceLevel{
     pub order_count: usize,
 }
 
-#[derive(Serialize,Deserialize)]
+#[derive(Serialize)]
 pub struct DepthResponse{
     pub bids:Vec<PriceLevel>,
     pub asks:Vec<PriceLevel>,

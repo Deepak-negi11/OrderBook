@@ -1,7 +1,7 @@
 use crate::{
     input::{CreateOrderInput, DeleteOrderInput},
-    orderbook::{self, Orderbook},
-    outputs::{CreateOrderOutput, DeleteOrderOutput, Depth},
+    orderbook::{ Orderbook},
+    output::{CreateOrderResponse, DeleteOrderResponse, DepthResponse},
 };
 use actix_web::{
     HttpResponse, Responder, delete, get, post,
@@ -20,17 +20,20 @@ pub async fn get_depth(orderbook: Data<Arc<Mutex<Orderbook>>>) -> impl Responder
 pub async fn create_order(orderbook:Data<Arc<Mutex<Orderbook>>>, Json(body):Json<CreateOrderInput>) -> impl Responder{
     let mut ob = orderbook.lock().unwrap();
     let result = ob.create_order(
-        body.price,
+        body
        
     );
-    HttpResponse.Ok().json(CreateOrderOutput{
-        order_id: result.order_id
+    HttpResponse::Ok().json(CreateOrderResponse{
+        order_id: result.order_id,
+        filled_qty: result.filled_qty,
+        average_price: result.average_price,
+        status:result.status
     })
 }
 
 
 #[delete("/order")]
-pub async fn delete_order(orderbook: Data<Arc<Mutex<Orderbook>>>, order: Json<DeleteOrder>) -> impl Responder {
+pub async fn delete_order(orderbook: Data<Arc<Mutex<Orderbook>>>, order: Json<DeleteOrderInput>) -> impl Responder {
     let mut orderbook = orderbook.lock().unwrap();
     let orderbook = orderbook.delete_order(order.0);
     HttpResponse::Ok().json(orderbook)

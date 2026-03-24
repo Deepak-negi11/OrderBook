@@ -1,9 +1,8 @@
-use crate::inputs::{CreateOrderInput, DeleteOrderInput, Side};
-use crate::output::{DelteOrderResponse, DepthResponse, PriceLevel};
-use crate::outputs::{CreateOrderResponse, DeleteOrderResponse, DepthResponse, PriceLevel};
+use crate::input::{CreateOrderInput, DeleteOrderInput, Side};
+use crate::output::{CreateOrderResponse, DeleteOrderResponse, DepthResponse, PriceLevel};
 use std::collections::{BTreeMap, VecDeque};
-use std::intrinsics::needs_drop;
-use std::{marker, primitive};
+
+
 
 #[derive(Debug, Clone)]
 pub struct Order {
@@ -53,7 +52,7 @@ impl Orderbook {
                     .take_while(|&ask_price| ask_price <= new_order.price)
                     .collect();
 
-                for asks_price in matching_price {
+                for ask_price in matching_price {
                     if new_order.quantity == 0 {break;}
 
                     if let Some(queue) = self.asks.get_mut(&ask_price){
@@ -62,7 +61,7 @@ impl Orderbook {
                             
                             let fill = new_order.quantity.min(maker.quantity);
                             filled_qty += fill;
-                            total_cost += fill * asks_price;
+                            total_cost += fill * ask_price;
 
                             new_order.quantity -= fill;
                             maker.quantity -= fill;
@@ -72,7 +71,7 @@ impl Orderbook {
                             }
                         }
                         if queue.is_empty(){
-                            self.asks.remove(&asks_price);
+                            self.asks.remove(&ask_price);
                         }
                     }
                 }
@@ -147,7 +146,7 @@ impl Orderbook {
         }
     }
 
-    pub fn delete_order(&mut self , input: DeleteOrderInput) -> DelteOrderResponse {
+    pub fn delete_order(&mut self , input: DeleteOrderInput) -> DeleteOrderResponse {
         let map = match input.side {
             Side::Buy => &mut self.bids,
             Side::Sell => &mut self.asks,
@@ -160,9 +159,9 @@ impl Orderbook {
                 map.remove(&input.price);
             }
             self.last_update_id += 1;
-            return DelteOrderResponse { order_id, success: true };
+            return DeleteOrderResponse { order_id, success: true };
         }
-        DelteOrderResponse { order_id, success: false }
+        DeleteOrderResponse { order_id, success: false }
     }
 
     pub fn get_depth(&self) -> DepthResponse{
